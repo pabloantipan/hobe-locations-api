@@ -1,6 +1,6 @@
-# HOBE MAPS API
+# HOBE API REST BOILERPLATE
 
-For serving Google Maps services
+For small MS that works with one or two entities.
 
 ## Features
 
@@ -10,41 +10,42 @@ For serving Google Maps services
 
 ## Requirements
 
-- Go 1.16 or higher
+- Go 1.23
 - A running instance of a datastore documental database (Google Cloud Datastore)
 
 ## Installation
 
 1. Clone the repository:
   ```sh
-  git clone https://github.com/pabloantipan/go-api-rest.git
+  git clone <URL>
   ```
 2. Navigate to the project directory:
   ```sh
-  cd api-rest
+  cd hobe-api-boilerplate
   ```
-3. Install dependencies:
+3. Do not forget to rename before install!
+
+4. Install dependencies:
   ```sh
   go mod tidy
   ```
 
 ## Configuration
 
-Add datastore-service_account.json file in service_accounts folder
+Add datastore_sa.json file in service_accounts folder
+Add loggin_sa.json file in service_accounts folder
 
-Create a `.env` file in the root directory and add your database configuration:
-```env
-DATASTORE_SERVICE_ACCOUNT_PATH=your/path/to/file/
-```
+Create a `.env` file in the root directory and add your database configuration.
+Watch .env.example for requires vars and values.
 
 ## Running the Application
 
 To start the server, run:
 ```sh
-go run main.go
+go run cmd/server/main.go
 ```
 
-The server will start on `http://localhost:8080`.
+The server will start on `http://localhost:8082`.
 
 ## API Endpoints
 
@@ -60,10 +61,6 @@ Run
 ```sh
 swag init -g cmd/server/main.go -o docs/swagger
 ```
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.
 
 ## License
 
