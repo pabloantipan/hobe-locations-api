@@ -1,0 +1,72 @@
+basePath: /api/v1
+definitions:
+  domain.Player:
+    properties:
+      age:
+        example: 25
+        type: integer
+      id:
+        example: "1"
+        type: string
+      name:
+        example: John Doe
+        type: string
+      position:
+        example: Forward
+        type: string
+      rating:
+        example: 7.5
+        type: number
+    required:
+    - age
+    - name
+    - position
+    - rating
+    type: object
+  gin.H:
+    additionalProperties: {}
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API Server for Player Management
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Player API
+  version: "1.0"
+paths:
+  /players:
+    post:
+      consumes:
+      - application/json
+      description: Create a new player with the provided input data
+      parameters:
+      - description: Player object
+        in: body
+        name: player
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Player'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Player'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Create a new player
+      tags:
+      - players
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

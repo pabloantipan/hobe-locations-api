@@ -1,0 +1,75 @@
+name: Deploy to Cloud Run
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+  SERVICE_NAME: hobe-bck-maps-api
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Decode vars and create files
+        id: set_vars
+        run: |
+          echo '${{ vars.ENV_FILE }}' > .env
+          echo "$(echo '${{ vars.DATASTORE_SA }}' | jq -r . )" > datastore_sa.json
+          echo "$(echo '${{ vars.FIREBASE_SA }}' | jq -r . )" > firebase_sa.json
+          echo "$(echo '${{ vars.LOGGING_SA }}' | jq -r . )" > logging_sa.json
+
+      # - name: Setup Go
+      #   uses: actions/setup-go@v4
+      #   with:
+      #     go-version: '1.23'
+
+      # - name: Test
+      #   run: go test -v ./...
+
+      # - name: Build
+      #   run: go build -v -o app ./cmd/main.go
+
+      - name: Auth GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ vars.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ vars.GCP_SA_KEY }}
+
+      - name: Use gcloud CLI
+        run: |
+          echo '${{ vars.GCP_SA_KEY }}' | jq -r . > gcp-sa-key.json
+          gcloud auth activate-service-account --key-file=gcp-sa-key.json --account=${{ vars.GCP_SA_EMAIL }}
+          gcloud config set project $PROJECT_ID
+          gcloud config set compute/region us
+          gcloud auth configure-docker us-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build -t us-docker.pkg.dev/$PROJECT_ID/gcr.io/$SERVICE_NAME:latest .
+
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push us-docker.pkg.dev/$PROJECT_ID/gcr.io/$SERVICE_NAME:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image us-docker.pkg.dev/$PROJECT_ID/gcr.io/$SERVICE_NAME:latest \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --max-instances 1 \
+            --concurrency 80 \
+            --min 0 \
+            --cpu 1 \
+            --memory 128Mi
