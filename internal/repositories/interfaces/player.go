@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/pabloantipan/hobe-maps-api/internal/models"
+import "github.com/pabloantipan/hobe-locations-api/internal/models"
 
 type PlayerRepository interface {
 	Create(player models.Player) (models.Player, error)

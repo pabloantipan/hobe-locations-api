@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pabloantipan/hobe-maps-api/internal/models"
-	"github.com/pabloantipan/hobe-maps-api/internal/services"
+	"github.com/pabloantipan/hobe-locations-api/internal/models"
+	"github.com/pabloantipan/hobe-locations-api/internal/services"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/pabloantipan/hobe-maps-api/internal/models"
-	"github.com/pabloantipan/hobe-maps-api/internal/repositories/interfaces"
+	"github.com/pabloantipan/hobe-locations-api/internal/models"
+	"github.com/pabloantipan/hobe-locations-api/internal/repositories/interfaces"
 )
 
 type PlayerService struct {

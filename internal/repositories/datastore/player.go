@@ -3,8 +3,8 @@ package datastore
 import (
 	"context"
 
-	"github.com/pabloantipan/hobe-maps-api/internal/models"
-	"github.com/pabloantipan/hobe-maps-api/internal/repositories/interfaces"
+	"github.com/pabloantipan/hobe-locations-api/internal/models"
+	"github.com/pabloantipan/hobe-locations-api/internal/repositories/interfaces"
 
 	"cloud.google.com/go/datastore"
 	"github.com/google/uuid"

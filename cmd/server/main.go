@@ -4,17 +4,17 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/pabloantipan/hobe-maps-api/config"
-	"github.com/pabloantipan/hobe-maps-api/internal/cloud"
-	"github.com/pabloantipan/hobe-maps-api/internal/middleware"
-	"github.com/pabloantipan/hobe-maps-api/internal/repositories/datastore"
-	"github.com/pabloantipan/hobe-maps-api/internal/services"
+	"github.com/pabloantipan/hobe-locations-api/config"
+	"github.com/pabloantipan/hobe-locations-api/internal/cloud"
+	"github.com/pabloantipan/hobe-locations-api/internal/middleware"
+	"github.com/pabloantipan/hobe-locations-api/internal/repositories/datastore"
+	"github.com/pabloantipan/hobe-locations-api/internal/services"
 
-	"github.com/pabloantipan/hobe-maps-api/internal/handlers"
+	"github.com/pabloantipan/hobe-locations-api/internal/handlers"
 
 	"github.com/gin-gonic/gin"
 
-	_ "github.com/pabloantipan/hobe-maps-api/docs/swagger"
+	_ "github.com/pabloantipan/hobe-locations-api/docs/swagger"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
