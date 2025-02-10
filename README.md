@@ -1,6 +1,6 @@
-# HOBE API REST BOILERPLATE
+# HOBE LOCATIONS API REST
 
-For small MS that works with one or two entities.
+For saving location data
 
 ## Features
 
@@ -49,11 +49,7 @@ The server will start on `http://localhost:8082`.
 
 ## API Endpoints
 
-- `GET /players` - List all players
-- `GET /players/{id}` - Get a specific resource
-- `POST /players` - Create a new resource
-- `PUT /players/{id}` - Update a specific resource
-- `DELETE /players/{id}` - Delete a specific resource
+Ask for postman file
 
 ## Generate DOCS
 
