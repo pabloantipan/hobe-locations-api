@@ -1,4 +1,4 @@
-package datastore
+package storage
 
 import (
 	"context"
@@ -6,22 +6,19 @@ import (
 	"log"
 	"os"
 
+	"cloud.google.com/go/storage"
 	"github.com/pabloantipan/hobe-locations-api/config"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
-
-	"cloud.google.com/go/datastore"
 	"google.golang.org/api/option"
 )
 
-const databaseID = "sport-api-rest"
-
-func NewDatastoreClient(cfg *config.Config) *datastore.Client {
-	if cfg.DatastoreServiceAccountPath == "" {
+func NewStorageClient(cfg *config.Config) *storage.Client {
+	if cfg.StorageServiceAccountPath == "" {
 		log.Printf("DATASTORE_SERVICE_ACCOUNT_PATH environment variable not set")
 		return nil
 	}
 
-	data, err := os.ReadFile(cfg.DatastoreServiceAccountPath)
+	data, err := os.ReadFile(cfg.StorageServiceAccountPath)
 	if err != nil {
 		log.Printf("Failed to read service account file: %v", err)
 		return nil
@@ -34,15 +31,12 @@ func NewDatastoreClient(cfg *config.Config) *datastore.Client {
 	}
 
 	ctx := context.Background()
-	client, err := datastore.NewClientWithDatabase(
+	client, err := storage.NewClient(
 		ctx,
-		sa.ProjectID,
-		databaseID,
-		option.WithCredentialsFile(cfg.DatastoreServiceAccountPath),
+		option.WithCredentialsFile(cfg.StorageServiceAccountPath),
 	)
-
 	if err != nil {
-		log.Fatalf("Failed to create datastore client: %v", err)
+		log.Fatalf("failed to create storage client: %v", err)
 		return nil
 	}
 

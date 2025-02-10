@@ -11,7 +11,8 @@ type Config struct {
 	Port                        string
 	ProjectID                   string
 	DatastoreServiceAccountPath string
-	CloudLoggingCredentialsFile string
+	LoggingServiceAccountPath   string
+	StorageServiceAccountPath   string
 }
 
 func LoadConfig() (*Config, error) {
@@ -24,7 +25,8 @@ func LoadConfig() (*Config, error) {
 		Port:                        os.Getenv("PORT"),
 		ProjectID:                   os.Getenv("PROJECT_ID"),
 		DatastoreServiceAccountPath: os.Getenv("DATASTORE_SERVICE_ACCOUNT_FILE"),
-		CloudLoggingCredentialsFile: os.Getenv("LOGGING_SERVICE_ACCOUNT_FILE"),
+		LoggingServiceAccountPath:   os.Getenv("LOGGING_SERVICE_ACCOUNT_FILE"),
+		StorageServiceAccountPath:   os.Getenv("STORAGE_SERVICE_ACCOUNT_FILE"),
 	}
 
 	return config, nil
