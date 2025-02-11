@@ -8,6 +8,7 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/internal/cloud"
 	"github.com/pabloantipan/hobe-locations-api/internal/middleware"
 	"github.com/pabloantipan/hobe-locations-api/internal/repositories/datastore"
+	"github.com/pabloantipan/hobe-locations-api/internal/repositories/storage"
 	"github.com/pabloantipan/hobe-locations-api/internal/services"
 
 	"github.com/pabloantipan/hobe-locations-api/internal/handlers"
@@ -51,12 +52,15 @@ func main() {
 
 	// Initialize Datastore client
 	datastoreClient := datastore.NewDatastoreClient(cfg)
+	storageClient := storage.NewStorageClient(cfg)
 
 	// Initialize repositories
 	playerRepo := datastore.NewDatastorePlayerRepository(datastoreClient)
+	pictureRepo := storage.NewPictureRepository(storageClient)
 
 	// Initialize services
 	playerService := services.NewPlayerService(playerRepo)
+	pictureService := services.NewPictureService(pictureRepo)
 
 	// Initialize middlewares
 	requestLoggerMiddleware := middleware.NewRequestLoggerMiddleware(logger)
@@ -64,6 +68,7 @@ func main() {
 
 	// Initialize handlers
 	playerHandler := handlers.NewPlayerHandler(playerService)
+	pictureHandler := handlers.NewPictureHandler(pictureService)
 
 	// Add(rateLimiter.Handle)
 	healthHandler := handlers.NewHealthHandler(cfg)
@@ -71,6 +76,7 @@ func main() {
 	// Setup router
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.Use(gin.Logger())
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler,
 		ginSwagger.DefaultModelsExpandDepth(-1)),
@@ -82,6 +88,10 @@ func main() {
 
 	api := router.Group("/api/v1")
 	{
+		picture := api.Group("/picture")
+		{
+			picture.POST("", pictureHandler.Upload)
+		}
 		players := api.Group("/players")
 		{
 			players.Use(requestLoggerMiddleware.HandleFunc())

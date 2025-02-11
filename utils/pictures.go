@@ -52,6 +52,7 @@ func (v *ImageValidator) ValidateFileType(fileBytes []byte) (*types.Type, except
 	}
 
 	if !v.isAllowedMimeType(kind.MIME.Value) {
+		fmt.Println("mime: ", kind.MIME.Value)
 		return nil, exceptions.NewPictureException(exceptions.MimeTypeNotAllowed)
 	}
 
@@ -70,7 +71,7 @@ func (v *ImageValidator) ValidateImageIntegrity(fileBytes []byte) (image.Image, 
 	// Check image dimensions
 	bounds := img.Bounds()
 	if bounds.Dx() > v.MaxDimensions || bounds.Dy() > v.MaxDimensions {
-		fmt.Errorf("image dimensions exceed maximum allowed size of %dx%d", v.MaxDimensions, v.MaxDimensions)
+		// fmt.Errorf("image dimensions exceed maximum allowed size of %dx", v.MaxDimensions)
 		return nil, exceptions.NewPictureException(exceptions.ExceedsMaxSize)
 	}
 
@@ -87,6 +88,10 @@ func (v *ImageValidator) ValidateImageIntegrity(fileBytes []byte) (image.Image, 
 
 func (v *ImageValidator) isAllowedExtension(ext string) bool {
 	for _, allowed := range v.AllowedTypes {
+		fmt.Println("ext: ", ext, allowed)
+		if "image/"+strings.TrimLeft(ext, ".") == allowed {
+			return true
+		}
 		if "."+allowed == ext {
 			return true
 		}

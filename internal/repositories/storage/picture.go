@@ -18,7 +18,7 @@ type PictureRepository struct {
 }
 
 func NewPictureRepository(client *storage.Client) PictureRepositoryInterface {
-	bucketName := "hobe-locations-api-pictures"
+	bucketName := "hobe-location-picrtures"
 
 	return &PictureRepository{
 		bucketName: bucketName,
@@ -55,9 +55,9 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 	}
 
 	// Make the file public
-	if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
-		return nil, fmt.Errorf("failed to make file public: %v", err)
-	}
+	// if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
+	// 	return nil, fmt.Errorf("failed to make file public: %v", err)
+	// }
 
 	attrs, err := obj.Attrs(ctx)
 	if err != nil {

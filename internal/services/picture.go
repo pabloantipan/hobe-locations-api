@@ -36,7 +36,12 @@ func (s *PictureService) Upload(file *multipart.FileHeader) (*models.FileInfo, e
 		return nil, fmt.Errorf("failed to validate file: %v", err)
 	}
 
-	return s.repo.Upload(ctx, file)
+	result, error := s.repo.Upload(ctx, file)
+	if error != nil {
+		return nil, fmt.Errorf("failed to upload file: %v", error)
+	}
+
+	return result, nil
 }
 
 func (s *PictureService) validate(file *multipart.FileHeader) (bool, exceptions.PictureException) {

@@ -9,6 +9,7 @@ import (
 )
 
 type HealthResponse struct {
+	Who       string            `json:"who"`
 	Status    string            `json:"status"`
 	Version   string            `json:"version"`
 	Services  map[string]string `json:"services"`
@@ -36,6 +37,7 @@ func (h *HealthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := HealthResponse{
+		Who:       "hobe-locations-api",
 		Status:    "UP",
 		Version:   h.cfg.Version,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
