@@ -24,7 +24,7 @@ type LocationsHandlerInterface interface {
 func (h *LocationsHandler) Add(c *gin.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "couldn't get form data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "couldn't get form data", "details": err.Error()})
 		return
 	}
 

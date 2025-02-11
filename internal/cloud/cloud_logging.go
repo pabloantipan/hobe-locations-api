@@ -39,11 +39,12 @@ func NewCloudLogger(cfg *config.Config) (*CloudLogger, error) {
 	}, nil
 }
 
-func (cl *CloudLogger) LogRequest(method, path string, status int, latency float64) {
+func (cl *CloudLogger) LogRequest(method, payload interface{}, path string, status int, latency float64) {
 	cl.logger.Log(logging.Entry{
 		Payload: map[string]interface{}{
 			"who":     cl.cfg.Who,
 			"method":  method,
+			"payload": payload,
 			"path":    path,
 			"status":  status,
 			"type":    "request",
@@ -53,11 +54,12 @@ func (cl *CloudLogger) LogRequest(method, path string, status int, latency float
 	})
 }
 
-func (cl *CloudLogger) LogError(err error, method, path string, latency float64) {
+func (cl *CloudLogger) LogError(err error, payload interface{}, method, path string, latency float64) {
 	cl.logger.Log(logging.Entry{
 		Payload: map[string]interface{}{
 			"who":     cl.cfg.Who,
 			"error":   err.Error(),
+			"payload": payload,
 			"method":  method,
 			"path":    path,
 			"type":    "error",

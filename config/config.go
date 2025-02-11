@@ -11,6 +11,7 @@ type Config struct {
 	Version                     string
 	Port                        string
 	ProjectID                   string
+	DatastoreDatabaseID         string
 	DatastoreServiceAccountPath string
 	LoggingServiceAccountPath   string
 	StorageServiceAccountPath   string
@@ -26,6 +27,7 @@ func LoadConfig() (*Config, error) {
 		Version:                     os.Getenv("VERSION"),
 		Port:                        os.Getenv("PORT"),
 		ProjectID:                   os.Getenv("PROJECT_ID"),
+		DatastoreDatabaseID:         os.Getenv("DATASTORE_DATABASE_ID"),
 		DatastoreServiceAccountPath: os.Getenv("DATASTORE_SERVICE_ACCOUNT_FILE"),
 		LoggingServiceAccountPath:   os.Getenv("LOGGING_SERVICE_ACCOUNT_FILE"),
 		StorageServiceAccountPath:   os.Getenv("STORAGE_SERVICE_ACCOUNT_FILE"),
