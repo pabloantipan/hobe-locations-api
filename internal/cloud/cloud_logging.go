@@ -18,12 +18,12 @@ type CloudLogger struct {
 
 func NewCloudLogger(cfg *config.Config) (*CloudLogger, error) {
 	ctx := context.Background()
-	if cfg.CloudLoggingCredentialsFile == "" {
+	if cfg.LoggingServiceAccountPath == "" {
 		log.Fatalf("CLOUD_LOGGING_CREDENTIALS_FILE environment variable not set")
 	}
 
 	client, err := logging.NewClient(ctx, cfg.ProjectID,
-		option.WithCredentialsFile(cfg.CloudLoggingCredentialsFile),
+		option.WithCredentialsFile(cfg.LoggingServiceAccountPath),
 	)
 	if err != nil {
 		return nil, err

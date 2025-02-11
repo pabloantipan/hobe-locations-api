@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-  SERVICE_NAME: hobe-bck-maps-api
+  SERVICE_NAME: hobe-bck-locations-api
 
 jobs:
   deploy:
