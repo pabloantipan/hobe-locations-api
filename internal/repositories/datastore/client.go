@@ -13,8 +13,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-const databaseID = "sport-api-rest"
-
 func NewDatastoreClient(cfg *config.Config) *datastore.Client {
 	if cfg.DatastoreServiceAccountPath == "" {
 		log.Printf("DATASTORE_SERVICE_ACCOUNT_PATH environment variable not set")
@@ -37,7 +35,7 @@ func NewDatastoreClient(cfg *config.Config) *datastore.Client {
 	client, err := datastore.NewClientWithDatabase(
 		ctx,
 		sa.ProjectID,
-		databaseID,
+		cfg.DatastoreDatabaseID,
 		option.WithCredentialsFile(cfg.DatastoreServiceAccountPath),
 	)
 

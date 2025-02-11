@@ -89,18 +89,13 @@ func main() {
 		healthHandler.ServeHTTP(c.Writer, c.Request)
 	})
 
-	api := router.Group("/api/v1")
+	api := router.Group("locations/api/v1")
 	{
-		locations := api.Group("/locations")
+		locations := api.Group("")
 		{
 			locations.Use(requestLoggerMiddleware.HandleFunc())
 			locations.Use(responseLoggerMiddleware.HandleFunc())
 			locations.POST("", locationHandler.Add)
-		}
-		players := api.Group("/players")
-		{
-			players.Use(requestLoggerMiddleware.HandleFunc())
-			players.Use(responseLoggerMiddleware.HandleFunc())
 		}
 	}
 
