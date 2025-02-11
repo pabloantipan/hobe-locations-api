@@ -14,6 +14,7 @@ var logName = "hobe-locations-api"
 type CloudLogger struct {
 	client *logging.Client
 	logger *logging.Logger
+	cfg    *config.Config
 }
 
 func NewCloudLogger(cfg *config.Config) (*CloudLogger, error) {
@@ -34,12 +35,14 @@ func NewCloudLogger(cfg *config.Config) (*CloudLogger, error) {
 	return &CloudLogger{
 		client: client,
 		logger: logger,
+		cfg:    cfg,
 	}, nil
 }
 
 func (cl *CloudLogger) LogRequest(method, path string, status int, latency float64) {
 	cl.logger.Log(logging.Entry{
 		Payload: map[string]interface{}{
+			"who":     cl.cfg.Who,
 			"method":  method,
 			"path":    path,
 			"status":  status,
@@ -53,6 +56,7 @@ func (cl *CloudLogger) LogRequest(method, path string, status int, latency float
 func (cl *CloudLogger) LogError(err error, method, path string, latency float64) {
 	cl.logger.Log(logging.Entry{
 		Payload: map[string]interface{}{
+			"who":     cl.cfg.Who,
 			"error":   err.Error(),
 			"method":  method,
 			"path":    path,

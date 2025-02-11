@@ -71,7 +71,6 @@ func main() {
 	responseLoggerMiddleware := middleware.NewResponseLoggerMiddleware(logger)
 
 	// Initialize handlers
-	pictureHandler := handlers.NewPictureHandler(pictureService)
 	locationHandler := handlers.NewLocationsHandler(locationBusiness)
 
 	// Add(rateLimiter.Handle)
@@ -94,13 +93,9 @@ func main() {
 	{
 		locations := api.Group("/locations")
 		{
-			// locations.Use(requestLoggerMiddleware.HandleFunc())
-			// locations.Use(responseLoggerMiddleware.HandleFunc())
+			locations.Use(requestLoggerMiddleware.HandleFunc())
+			locations.Use(responseLoggerMiddleware.HandleFunc())
 			locations.POST("", locationHandler.Add)
-		}
-		picture := api.Group("/picture")
-		{
-			picture.POST("", pictureHandler.Upload)
 		}
 		players := api.Group("/players")
 		{
