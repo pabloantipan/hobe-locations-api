@@ -56,12 +56,10 @@ func main() {
 	storageClient := storage.NewStorageClient(cfg)
 
 	// Initialize repositories
-	playerRepo := datastore.NewDatastorePlayerRepository(datastoreClient)
 	pictureRepo := storage.NewPictureRepository(storageClient)
 	locationRepo := datastore.NewDatastoreLocationRepository(datastoreClient)
 
 	// Initialize services
-	playerService := services.NewPlayerService(playerRepo)
 	pictureService := services.NewPictureService(pictureRepo)
 	locationService := services.NewLocationService(locationRepo)
 
@@ -73,7 +71,6 @@ func main() {
 	responseLoggerMiddleware := middleware.NewResponseLoggerMiddleware(logger)
 
 	// Initialize handlers
-	playerHandler := handlers.NewPlayerHandler(playerService)
 	pictureHandler := handlers.NewPictureHandler(pictureService)
 	locationHandler := handlers.NewLocationsHandler(locationBusiness)
 
@@ -109,11 +106,6 @@ func main() {
 		{
 			players.Use(requestLoggerMiddleware.HandleFunc())
 			players.Use(responseLoggerMiddleware.HandleFunc())
-			players.POST("", playerHandler.Create)
-			players.GET("", playerHandler.GetAll)
-			players.GET("/:id", playerHandler.GetByID)
-			players.PUT("/:id", playerHandler.Update)
-			players.DELETE("/:id", playerHandler.Delete)
 		}
 	}
 
