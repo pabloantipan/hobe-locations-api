@@ -42,3 +42,9 @@ func NewStorageClient(cfg *config.Config) *storage.Client {
 
 	return client
 }
+
+func CloseStorageClient(client *storage.Client) {
+	if err := client.Close(); err != nil {
+		log.Printf("Failed to close storage client: %v", err)
+	}
+}

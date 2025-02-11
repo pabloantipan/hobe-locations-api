@@ -17,8 +17,6 @@ type ImageValidator struct {
 	MaxFileSize   int64
 	MaxDimensions int
 	AllowedTypes  []string
-	BucketName    string
-	ProjectID     string
 }
 
 // ValidateBasicProperties checks file size and basic mime type
@@ -87,7 +85,6 @@ func (v *ImageValidator) ValidateImageIntegrity(fileBytes []byte) (image.Image, 
 	return img, exceptions.NewPictureException(exceptions.NoException)
 }
 
-// Helper methods
 func (v *ImageValidator) isAllowedExtension(ext string) bool {
 	for _, allowed := range v.AllowedTypes {
 		if "."+allowed == ext {
