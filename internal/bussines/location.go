@@ -7,6 +7,7 @@ import (
 
 type LocationService struct {
 	pictureService services.PictureServiceInterface
+	// locationService services.LocationServiceInterface
 }
 
 func NewLocationService(pictureService services.PictureServiceInterface) LocationServiceInterface {
