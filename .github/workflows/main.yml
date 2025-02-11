@@ -21,7 +21,7 @@ jobs:
         run: |
           echo '${{ vars.ENV_FILE }}' > .env
           echo "$(echo '${{ vars.DATASTORE_SA }}' | jq -r . )" > datastore_sa.json
-          echo "$(echo '${{ vars.FIREBASE_SA }}' | jq -r . )" > firebase_sa.json
+          echo "$(echo '${{ vars.STORAGE_SA }}' | jq -r . )" > storage_sa.json
           echo "$(echo '${{ vars.LOGGING_SA }}' | jq -r . )" > logging_sa.json
 
       # - name: Setup Go
