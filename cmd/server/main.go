@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/pabloantipan/hobe-locations-api/config"
+	"github.com/pabloantipan/hobe-locations-api/internal/bussines"
 	"github.com/pabloantipan/hobe-locations-api/internal/cloud"
 	"github.com/pabloantipan/hobe-locations-api/internal/middleware"
 	"github.com/pabloantipan/hobe-locations-api/internal/repositories/datastore"
@@ -57,10 +58,15 @@ func main() {
 	// Initialize repositories
 	playerRepo := datastore.NewDatastorePlayerRepository(datastoreClient)
 	pictureRepo := storage.NewPictureRepository(storageClient)
+	locationRepo := datastore.NewDatastoreLocationRepository(datastoreClient)
 
 	// Initialize services
 	playerService := services.NewPlayerService(playerRepo)
 	pictureService := services.NewPictureService(pictureRepo)
+	locationService := services.NewLocationService(locationRepo)
+
+	// Initialize businesses
+	locationBusiness := bussines.NewLocationBusiness(pictureService, locationService)
 
 	// Initialize middlewares
 	requestLoggerMiddleware := middleware.NewRequestLoggerMiddleware(logger)
@@ -69,6 +75,7 @@ func main() {
 	// Initialize handlers
 	playerHandler := handlers.NewPlayerHandler(playerService)
 	pictureHandler := handlers.NewPictureHandler(pictureService)
+	locationHandler := handlers.NewLocationsHandler(locationBusiness)
 
 	// Add(rateLimiter.Handle)
 	healthHandler := handlers.NewHealthHandler(cfg)
@@ -88,6 +95,12 @@ func main() {
 
 	api := router.Group("/api/v1")
 	{
+		locations := api.Group("/locations")
+		{
+			// locations.Use(requestLoggerMiddleware.HandleFunc())
+			// locations.Use(responseLoggerMiddleware.HandleFunc())
+			locations.POST("", locationHandler.Add)
+		}
 		picture := api.Group("/picture")
 		{
 			picture.POST("", pictureHandler.Upload)
