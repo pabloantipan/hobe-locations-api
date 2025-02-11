@@ -1,6 +1,6 @@
 package models
 
-type picture struct {
+type Picture struct {
 	File      []byte `json:"file" binding:"required"`
 	Timestamp string `json:"timestamp" example:"2021-01-01T00:00:00Z"`
 }
@@ -15,7 +15,7 @@ type LocationRequest struct {
 	Name        string `json:"name" binding:"required" example:"John Doe"`
 	Comment     string `json:"comment" binding:"required" example:"This is a description"`
 	Coordinates `json:"coordinates" binding:"required"`
-	Pictures    []picture `json:"pictures" binding:"optional"`
+	Pictures    []Picture `json:"pictures" binding:"optional"`
 	Address     string    `json:"address" binding:"required" example:"Av. Corrientes 1234"`
 }
 

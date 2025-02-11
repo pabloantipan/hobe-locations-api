@@ -10,14 +10,17 @@ import (
 	"github.com/google/uuid"
 )
 
-const kindPlayer = "Player"
-
 type DatastorePlayerRepo struct {
+	kind   string
 	client *datastore.Client
 }
 
 func NewDatastorePlayerRepository(client *datastore.Client) interfaces.PlayerRepository {
-	return &DatastorePlayerRepo{client: client}
+	kind := "Player"
+	return &DatastorePlayerRepo{
+		client: client,
+		kind:   kind,
+	}
 }
 
 func (p *DatastorePlayerRepo) Create(player models.Player) (models.Player, error) {
@@ -28,7 +31,7 @@ func (p *DatastorePlayerRepo) Create(player models.Player) (models.Player, error
 	}
 
 	// Create new key
-	key := datastore.NameKey(kindPlayer, player.ID, nil)
+	key := datastore.NameKey(p.kind, player.ID, nil)
 
 	// Save entity
 	newKey, err := p.client.Put(ctx, key, &player)
@@ -44,7 +47,7 @@ func (p *DatastorePlayerRepo) Create(player models.Player) (models.Player, error
 func (p *DatastorePlayerRepo) GetByID(id string) (models.Player, error) {
 	ctx := context.Background()
 
-	key := datastore.NameKey(kindPlayer, id, nil)
+	key := datastore.NameKey(p.kind, id, nil)
 	player := &models.Player{}
 
 	if err := p.client.Get(ctx, key, player); err != nil {
@@ -59,7 +62,7 @@ func (p *DatastorePlayerRepo) GetAll() ([]models.Player, error) {
 	ctx := context.Background()
 
 	var players []models.Player
-	q := datastore.NewQuery(kindPlayer)
+	q := datastore.NewQuery(p.kind)
 
 	_, err := p.client.GetAll(ctx, q, &players)
 	if err != nil {
@@ -72,7 +75,7 @@ func (p *DatastorePlayerRepo) GetAll() ([]models.Player, error) {
 func (p *DatastorePlayerRepo) Update(player models.Player) (models.Player, error) {
 	ctx := context.Background()
 
-	key := datastore.NameKey(kindPlayer, player.ID, nil)
+	key := datastore.NameKey(p.kind, player.ID, nil)
 	_, err := p.client.Put(ctx, key, &player)
 	return player, err
 }
@@ -80,7 +83,7 @@ func (p *DatastorePlayerRepo) Update(player models.Player) (models.Player, error
 func (p *DatastorePlayerRepo) Delete(id string) error {
 	ctx := context.Background()
 
-	key := datastore.NameKey(kindPlayer, id, nil)
+	key := datastore.NameKey(p.kind, id, nil)
 	return p.client.Delete(ctx, key)
 }
 
@@ -88,7 +91,7 @@ func (p *DatastorePlayerRepo) Delete(id string) error {
 // 	ctx := context.Background()
 
 // 	var players []*models.Player
-// 	q := datastore.NewQuery(kindPlayer)
+// 	q := datastore.NewQuery(p.kind)
 
 // 	keys, err := p.client.GetAll(ctx, q, &players)
 // 	if err != nil {
@@ -108,7 +111,7 @@ func (p *DatastorePlayerRepo) Delete(id string) error {
 // 	ctx := context.Background()
 
 // 	var players []*models.Player
-// 	q := datastore.NewQuery(kindPlayer).
+// 	q := datastore.NewQuery(p.kind).
 // 		Filter("position =", position)
 
 // 	keys, err := p.client.GetAll(ctx, q, &players)
