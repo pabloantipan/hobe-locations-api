@@ -37,12 +37,12 @@ func (h *HealthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := HealthResponse{
-		Who:       "hobe-locations-api",
+		Who:       h.cfg.Who,
 		Status:    "UP",
 		Version:   h.cfg.Version,
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 		Services: map[string]string{
-			"players": "UP",
+			"locations": "UP",
 			// Add more services as they come
 		},
 	}
