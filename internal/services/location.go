@@ -2,14 +2,14 @@ package services
 
 import (
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
-	"github.com/pabloantipan/hobe-locations-api/internal/repositories/interfaces"
+	"github.com/pabloantipan/hobe-locations-api/internal/repositories/datastore"
 )
 
 type LocationService struct {
-	repo interfaces.LocationRepository
+	repo datastore.LocationRepository
 }
 
-func NewLocationService(repo interfaces.LocationRepository) LocationServiceInterface {
+func NewLocationService(repo datastore.LocationRepository) LocationServiceInterface {
 	return &LocationService{repo: repo}
 }
 
