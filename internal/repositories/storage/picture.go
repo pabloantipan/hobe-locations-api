@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
@@ -33,45 +34,55 @@ type PictureRepositoryInterface interface {
 }
 
 func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader) (*models.FileInfo, error) {
-	obj := r.bucket.Object(file.Filename)
-
-	writer := obj.NewWriter(ctx)
-	writer.ContentType = utils.FileHeadertContentType(file)
-
-	// Copy the file data to the object
-	filex, err := file.Open()
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %v", err)
-	}
-
-	if _, err := io.Copy(writer, filex); err != nil {
-		return nil, fmt.Errorf("failed to copy file to storage: %v", err)
-	}
-	defer filex.Close()
-
-	// Close the writer
-	if err := writer.Close(); err != nil {
-		return nil, fmt.Errorf("failed to close writer: %v", err)
-	}
-
-	// Make the file public
-	// if err := obj.ACL().Set(ctx, storage.AllUsers, storage.RoleReader); err != nil {
-	// 	return nil, fmt.Errorf("failed to make file public: %v", err)
-	// }
-
-	attrs, err := obj.Attrs(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get file attributes: %v", err)
-	}
-
-	return &models.FileInfo{
+	fileInfo := &models.FileInfo{
 		Name:        file.Filename,
-		Size:        attrs.Size,
-		ContentType: attrs.ContentType,
 		URL:         fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, file.Filename),
-		UploadedAt:  attrs.Created,
-	}, nil
+		ContentType: utils.FileHeadertContentType(file),
+	}
 
+	resultChan := make(chan *models.FileInfo, 1)
+	errorChan := make(chan error, 1)
+
+	go func() {
+		obj := r.bucket.Object(file.Filename)
+		writer := obj.NewWriter(ctx)
+		writer.ContentType = fileInfo.ContentType
+		defer writer.Close()
+
+		filex, err := file.Open()
+		if err != nil {
+			errorChan <- fmt.Errorf("failed to open file: %v", err)
+			return
+		}
+		defer filex.Close()
+
+		if _, err := io.Copy(writer, filex); err != nil {
+			errorChan <- fmt.Errorf("failed to copy file to storage: %v", err)
+			return
+		}
+
+		attrs, err := obj.Attrs(ctx)
+		if err != nil {
+			errorChan <- fmt.Errorf("failed to get file attributes: %v", err)
+			return
+		}
+
+		fileInfo.Size = attrs.Size
+		fileInfo.UploadedAt = attrs.Created
+
+		resultChan <- fileInfo
+	}()
+
+	select {
+	case fileInfo := <-resultChan:
+		return fileInfo, nil
+	case err := <-errorChan:
+		return nil, err
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case <-time.After(5 * time.Second):
+		return nil, fmt.Errorf("upload process timed out")
+	}
 }
 
 func (r *PictureRepository) GetURL(filename string) string {

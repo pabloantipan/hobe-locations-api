@@ -3,6 +3,7 @@ package cloud
 import (
 	"context"
 	"log"
+	"time"
 
 	"cloud.google.com/go/logging"
 	"github.com/pabloantipan/hobe-locations-api/config"
@@ -37,6 +38,18 @@ func NewCloudLogger(cfg *config.Config) (*CloudLogger, error) {
 		logger: logger,
 		cfg:    cfg,
 	}, nil
+}
+
+func (cl *CloudLogger) Log(payload interface{}) {
+	cl.logger.Log(logging.Entry{
+		Payload: map[string]interface{}{
+			"who":     cl.cfg.Who,
+			"type":    "info",
+			"payload": payload,
+		},
+		Severity:  logging.Info,
+		Timestamp: time.Now(),
+	})
 }
 
 func (cl *CloudLogger) LogRequest(method, payload interface{}, path string, status int, latency float64) {
