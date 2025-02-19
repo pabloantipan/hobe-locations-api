@@ -35,6 +35,7 @@ func (r *DatastoreLocationRepo) Add(location models.Location) (models.Location, 
 	if location.ID == "" {
 		location.ID = uuid.New().String()
 	}
+
 	key := datastore.NameKey(r.kind, location.ID, nil)
 
 	newKey, err := r.client.Put(ctx, key, &location)
