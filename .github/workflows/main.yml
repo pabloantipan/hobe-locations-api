@@ -67,7 +67,6 @@ jobs:
             --image us-docker.pkg.dev/$PROJECT_ID/gcr.io/$SERVICE_NAME:latest \
             --platform managed \
             --region us-central1 \
-            --allow-unauthenticated \
             --max-instances 1 \
             --concurrency 80 \
             --min 0 \

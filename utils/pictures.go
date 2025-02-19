@@ -88,7 +88,6 @@ func (v *ImageValidator) ValidateImageIntegrity(fileBytes []byte) (image.Image, 
 
 func (v *ImageValidator) isAllowedExtension(ext string) bool {
 	for _, allowed := range v.AllowedTypes {
-		fmt.Println("ext: ", ext, allowed)
 		if "image/"+strings.TrimLeft(ext, ".") == allowed {
 			return true
 		}

@@ -6,7 +6,6 @@ import (
 	"cloud.google.com/go/datastore"
 	"github.com/google/uuid"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
-	"github.com/pabloantipan/hobe-locations-api/internal/repositories/interfaces"
 )
 
 type DatastoreLocationRepo struct {
@@ -14,12 +13,20 @@ type DatastoreLocationRepo struct {
 	client *datastore.Client
 }
 
-func NewDatastoreLocationRepository(client *datastore.Client) interfaces.LocationRepository {
+func NewDatastoreLocationRepository(client *datastore.Client) LocationRepository {
 	kind := "Location"
 	return &DatastoreLocationRepo{
 		client: client,
 		kind:   kind,
 	}
+}
+
+type LocationRepository interface {
+	Add(location models.Location) (models.Location, error)
+	GetByID(id string) (models.Location, error)
+	GetAll() ([]models.Location, error)
+	Update(location models.Location) (models.Location, error)
+	Delete(id string) error
 }
 
 func (r *DatastoreLocationRepo) Add(location models.Location) (models.Location, error) {
@@ -28,6 +35,7 @@ func (r *DatastoreLocationRepo) Add(location models.Location) (models.Location, 
 	if location.ID == "" {
 		location.ID = uuid.New().String()
 	}
+
 	key := datastore.NameKey(r.kind, location.ID, nil)
 
 	newKey, err := r.client.Put(ctx, key, &location)

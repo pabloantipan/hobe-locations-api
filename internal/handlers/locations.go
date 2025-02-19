@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pabloantipan/hobe-locations-api/internal/bussines"
@@ -28,28 +28,16 @@ func (h *LocationsHandler) Add(c *gin.Context) {
 		return
 	}
 
-	latitude, err := strconv.ParseFloat(form.Value["Latitude"][0], 64)
+	newLocation, err := models.ValidateLocationRequest(form)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Latitude must be a number"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "couldn't parse form data",
+			"details": strings.Split(err.Error(), "\n"),
+		})
 		return
 	}
 
-	longitude, err := strconv.ParseFloat(form.Value["Longitude"][0], 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Longitude must be a number"})
-		return
-	}
-
-	var request = models.LocationRequest{
-		Address:   form.Value["Address"][0],
-		Comment:   form.Value["Comment"][0],
-		Latitude:  latitude,
-		Longitude: longitude,
-		Name:      form.Value["Name"][0],
-		Pictures:  form.File["pictures[]"],
-	}
-
-	location, err := h.business.Add(request)
+	location, err := h.business.Add(*newLocation)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
