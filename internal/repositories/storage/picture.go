@@ -30,7 +30,7 @@ func NewPictureRepository(client *storage.Client) PictureRepositoryInterface {
 }
 
 type PictureRepositoryInterface interface {
-	GetURL(locationID, pictureName string) string
+	GetURL(subfolder, pictureName string) string
 	Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 }
 
@@ -98,10 +98,10 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 	}
 }
 
-func (r *PictureRepository) GetURL(locationID, filename string) string {
+func (r *PictureRepository) GetURL(subfolder, filename string) string {
 	objectPath := filename
-	if locationID != "" {
-		objectPath = path.Join(locationID, filename)
+	if subfolder != "" {
+		objectPath = path.Join(subfolder, filename)
 	}
 
 	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, objectPath)
