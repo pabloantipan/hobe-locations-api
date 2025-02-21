@@ -20,23 +20,23 @@ func NewPictureService(repo storage.PictureRepositoryInterface) PictureServiceIn
 }
 
 type PictureServiceInterface interface {
-	GetURL(pictureName string) string
-	Upload(file *multipart.FileHeader) (*models.FileInfo, error)
+	GetURL(locationID, pictureName string) string
+	Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 	validate(file *multipart.FileHeader) (bool, exceptions.PictureException)
 }
 
-func (s *PictureService) GetURL(pictureName string) string {
-	return s.repo.GetURL(pictureName)
+func (s *PictureService) GetURL(locationID, pictureName string) string {
+	return s.repo.GetURL(locationID, pictureName)
 }
 
-func (s *PictureService) Upload(file *multipart.FileHeader) (*models.FileInfo, error) {
+func (s *PictureService) Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
 	ctx := context.Background()
 	_, err := s.validate(file)
 	if err.IsPictureError() {
 		return nil, fmt.Errorf("failed to validate file: %v", err)
 	}
 
-	result, error := s.repo.Upload(ctx, file)
+	result, error := s.repo.Upload(ctx, file, subfolder)
 	if error != nil {
 		return nil, fmt.Errorf("failed to upload file: %v", error)
 	}

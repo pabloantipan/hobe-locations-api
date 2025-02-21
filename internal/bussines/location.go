@@ -1,9 +1,11 @@
 package bussines
 
 import (
+	"log"
 	"mime/multipart"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
 	"github.com/pabloantipan/hobe-locations-api/internal/services"
 )
@@ -28,16 +30,23 @@ type LocationBusinessInterface interface {
 }
 
 func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location, error) {
-	pictures, _ := s.uploadPictures(request.Pictures)
+	locationID := uuid.New().String()
+
+	pictures, errs := s.uploadPictures(locationID, request.Pictures)
+	log.Printf("Errors uploading files: %v", errs)
 
 	location := models.Location{
-		Name:      request.Name,
-		Comment:   request.Comment,
-		Latitude:  request.Latitude,
-		Longitude: request.Longitude,
-		Address:   request.Address,
-		Pictures:  pictures,
-		CreatedOn: time.Now(),
+		ID:             locationID,
+		UserID:         request.UserID,
+		UserEmail:      request.UserEmail,
+		UserFirebaseID: request.UserFirebaseID,
+		Name:           request.Name,
+		Comment:        request.Comment,
+		Latitude:       request.Latitude,
+		Longitude:      request.Longitude,
+		Address:        request.Address,
+		Pictures:       pictures,
+		CreatedOn:      time.Now(),
 	}
 
 	location, err := s.locationService.Add(location)
@@ -48,14 +57,13 @@ func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location
 	return &location, nil
 }
 
-func (s *LocationBusiness) uploadPictures(pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
-	// var pictureURLs = make([]models.FileInfo, 0)
+func (s *LocationBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
 	var pictureURLs = make([]models.BucketPicture, 0)
 
 	var errors = make([]error, 0)
 
 	for _, picture := range pictures {
-		uploadResult, err := s.pictureService.Upload(picture)
+		uploadResult, err := s.pictureService.Upload(picture, locationID)
 		if err != nil {
 			errors = append(errors, err)
 			continue

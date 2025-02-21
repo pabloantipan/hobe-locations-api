@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"path"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -29,14 +30,19 @@ func NewPictureRepository(client *storage.Client) PictureRepositoryInterface {
 }
 
 type PictureRepositoryInterface interface {
-	GetURL(pictureName string) string
-	Upload(ctx context.Context, file *multipart.FileHeader) (*models.FileInfo, error)
+	GetURL(locationID, pictureName string) string
+	Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 }
 
-func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader) (*models.FileInfo, error) {
+func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
+	objectPath := file.Filename
+	if subfolder != "" {
+		objectPath = path.Join(subfolder, file.Filename)
+	}
+
 	fileInfo := &models.FileInfo{
 		Name:        file.Filename,
-		URL:         fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, file.Filename),
+		URL:         fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, objectPath),
 		ContentType: utils.FileHeadertContentType(file),
 	}
 
@@ -44,9 +50,10 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 	errorChan := make(chan error, 1)
 
 	go func() {
-		obj := r.bucket.Object(file.Filename)
+		obj := r.bucket.Object(objectPath)
 		writer := obj.NewWriter(ctx)
 		writer.ContentType = fileInfo.ContentType
+
 		defer writer.Close()
 
 		filex, err := file.Open()
@@ -61,6 +68,11 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 			return
 		}
 
+		if err := writer.Close(); err != nil {
+			errorChan <- fmt.Errorf("failed to close writer: %v", err)
+			return
+		}
+
 		attrs, err := obj.Attrs(ctx)
 		if err != nil {
 			errorChan <- fmt.Errorf("failed to get file attributes: %v", err)
@@ -69,6 +81,7 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 
 		fileInfo.Size = attrs.Size
 		fileInfo.UploadedAt = attrs.Created
+		fileInfo.Path = objectPath
 
 		resultChan <- fileInfo
 	}()
@@ -85,6 +98,11 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 	}
 }
 
-func (r *PictureRepository) GetURL(filename string) string {
-	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, filename)
+func (r *PictureRepository) GetURL(locationID, filename string) string {
+	objectPath := filename
+	if locationID != "" {
+		objectPath = path.Join(locationID, filename)
+	}
+
+	return fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, objectPath)
 }
