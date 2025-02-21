@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"mime/multipart"
 	"path/filepath"
@@ -52,7 +51,6 @@ func (v *ImageValidator) ValidateFileType(fileBytes []byte) (*types.Type, except
 	}
 
 	if !v.isAllowedMimeType(kind.MIME.Value) {
-		fmt.Println("mime: ", kind.MIME.Value)
 		return nil, exceptions.NewPictureException(exceptions.MimeTypeNotAllowed)
 	}
 

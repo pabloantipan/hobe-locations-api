@@ -11,13 +11,15 @@ import (
 )
 
 type LocationRequest struct {
-	ID        string                  `form:"id" example:"1"`
-	Name      string                  `form:"name" binding:"required" example:"John Doe"`
-	Comment   string                  `form:"comment" binding:"required" example:"This is a description"`
-	Latitude  float64                 `form:"latitude" binding:"required" example:"-34.603722"`
-	Longitude float64                 `form:"longitude" binding:"required" example:"-58.381592"`
-	Pictures  []*multipart.FileHeader `form:"pictures" binding:"required"`
-	Address   string                  `form:"address" binding:"required" example:"Av. Corrientes 1234"`
+	UserID         string                  `form:"userId" binding:"required" example:"1"`
+	UserEmail      string                  `form:"userEmail" binding:"required" example:"john@doe.com"`
+	UserFirebaseID string                  `form:"userFirebaseId" binding:"required" example:"123456"`
+	Name           string                  `form:"name" binding:"required" example:"John Doe"`
+	Comment        string                  `form:"comment" binding:"required" example:"This is a description"`
+	Latitude       float64                 `form:"latitude" binding:"required" example:"-34.603722"`
+	Longitude      float64                 `form:"longitude" binding:"required" example:"-58.381592"`
+	Pictures       []*multipart.FileHeader `form:"pictures" binding:"required"`
+	Address        string                  `form:"address" binding:"required" example:"Av. Corrientes 1234"`
 }
 
 func validateFormData(form *multipart.Form) (*LocationRequest, error) {
@@ -25,10 +27,28 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 
 	var errorMessages = make([]string, 0)
 
+	if userIdSlice, ok := form.Value["userId"]; ok && len(userIdSlice) > 0 {
+		req.UserID = userIdSlice[0]
+	} else {
+		errorMessages = append(errorMessages, "userId is required")
+	}
+
+	if userEmailSlice, ok := form.Value["userEmail"]; ok && len(userEmailSlice) > 0 {
+		req.UserEmail = userEmailSlice[0]
+	} else {
+		errorMessages = append(errorMessages, "userEmail is required")
+	}
+
+	if userFirebaseIdSlice, ok := form.Value["userFirebaseId"]; ok && len(userFirebaseIdSlice) > 0 {
+		req.UserFirebaseID = userFirebaseIdSlice[0]
+	} else {
+		errorMessages = append(errorMessages, "userFirebaseId is required")
+	}
+
 	if namesSlice, ok := form.Value["name"]; ok && len(namesSlice) > 0 {
 		req.Name = namesSlice[0]
 	} else {
-		errorMessages = append(errorMessages, "names are required")
+		errorMessages = append(errorMessages, "name are required")
 	}
 
 	if commentSlice, ok := form.Value["comment"]; ok && len(commentSlice) > 0 {
@@ -40,16 +60,16 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 	if latitudeSlice, ok := form.Value["latitude"]; ok && len(latitudeSlice) > 0 {
 		req.Latitude = utils.ParseEnvFloat64(latitudeSlice[0])
 	} else {
-		errorMessages = append(errorMessages, "nickname is required")
+		errorMessages = append(errorMessages, "latitud is required")
 	}
 
 	if longitudeSlice, ok := form.Value["longitude"]; ok && len(longitudeSlice) > 0 {
 		req.Longitude = utils.ParseEnvFloat64(longitudeSlice[0])
 	} else {
-		errorMessages = append(errorMessages, "nickname is required")
+		errorMessages = append(errorMessages, "longitude is required")
 	}
 
-	if picturesHeaders, ok := form.File["pictures"]; ok {
+	if picturesHeaders, ok := form.File["pictures[]"]; ok {
 		req.Pictures = picturesHeaders
 	} else {
 		req.Pictures = []*multipart.FileHeader{}
@@ -58,7 +78,7 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 	if addressSlice, ok := form.Value["address"]; ok && len(addressSlice) > 0 {
 		req.Address = addressSlice[0]
 	} else {
-		errorMessages = append(errorMessages, "nickname is required")
+		errorMessages = append(errorMessages, "address is required")
 	}
 
 	if len(errorMessages) > 0 {
