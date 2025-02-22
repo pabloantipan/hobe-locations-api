@@ -17,6 +17,7 @@ type LocationServiceInterface interface {
 	Add(location models.Location) (models.Location, error)
 	GetByID(id string) (models.Location, error)
 	GetAll() ([]models.Location, error)
+	GetThemByEmail(email string) (*[]models.Location, error)
 	Update(location models.Location) (models.Location, error)
 	Delete(id string) error
 }
@@ -27,6 +28,10 @@ func (s *LocationService) Add(location models.Location) (models.Location, error)
 
 func (s *LocationService) GetByID(id string) (models.Location, error) {
 	return s.repo.GetByID(id)
+}
+
+func (s *LocationService) GetThemByEmail(email string) (*[]models.Location, error) {
+	return s.repo.GetThemByEmail(email)
 }
 
 func (s *LocationService) GetAll() ([]models.Location, error) {

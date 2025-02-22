@@ -27,6 +27,11 @@ func NewLocationBusiness(
 
 type LocationBusinessInterface interface {
 	Add(locationRequest models.LocationRequest) (*models.Location, error)
+	GetThemByEmail(email string) (*[]models.Location, error)
+}
+
+func (s *LocationBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
+	return s.locationService.GetThemByEmail(email)
 }
 
 func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location, error) {
