@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pabloantipan/hobe-locations-api/internal/bussines"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
+	"github.com/pabloantipan/hobe-locations-api/utils"
 )
 
 type LocationsHandler struct {
@@ -19,6 +20,7 @@ func NewLocationsHandler(b bussines.LocationBusinessInterface) LocationsHandlerI
 
 type LocationsHandlerInterface interface {
 	Add(c *gin.Context)
+	GetThemByEmail(c *gin.Context)
 }
 
 func (h *LocationsHandler) Add(c *gin.Context) {
@@ -44,4 +46,21 @@ func (h *LocationsHandler) Add(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, location)
+}
+
+func (h *LocationsHandler) GetThemByEmail(c *gin.Context) {
+	claims, err := utils.ParseClaimsAsUserData(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	locations, err := h.business.GetThemByEmail(claims.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"locations": locations})
+
 }

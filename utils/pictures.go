@@ -75,7 +75,7 @@ func (v *ImageValidator) ValidateImageIntegrity(fileBytes []byte) (image.Image, 
 
 	// Additional format-specific validation could be added here
 	switch format {
-	case "jpeg", "png", "gif":
+	case "jpg", "jpeg", "png", "gif":
 		// Format is already validated, but you could add format-specific checks here
 	default:
 		return nil, exceptions.NewPictureException(exceptions.UnknownExtension)

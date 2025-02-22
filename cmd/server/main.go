@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -40,6 +41,7 @@ import (
 // @securityDefinitions.basic  BasicAuth
 
 func main() {
+	ctx := context.Background()
 	// Load configuration
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -57,7 +59,7 @@ func main() {
 
 	// Initialize repositories
 	pictureRepo := storage.NewPictureRepository(storageClient)
-	locationRepo := datastore.NewDatastoreLocationRepository(datastoreClient)
+	locationRepo := datastore.NewDatastoreLocationRepository(ctx, datastoreClient)
 
 	// Initialize services
 	pictureService := services.NewPictureService(pictureRepo)
@@ -96,6 +98,7 @@ func main() {
 			locations.Use(requestLoggerMiddleware.HandleFunc())
 			locations.Use(responseLoggerMiddleware.HandleFunc())
 			locations.POST("", locationHandler.Add)
+			locations.GET("", locationHandler.GetThemByEmail)
 		}
 	}
 
