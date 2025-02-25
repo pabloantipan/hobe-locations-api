@@ -41,13 +41,14 @@ func generateFileName(filename string) string {
 }
 
 func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
+	newFileName := generateFileName(file.Filename)
 	objectPath := file.Filename
 	if subfolder != "" {
-		objectPath = path.Join(subfolder, generateFileName(file.Filename))
+		objectPath = path.Join(subfolder, newFileName)
 	}
 
 	fileInfo := &models.FileInfo{
-		Name:        file.Filename,
+		Name:        newFileName,
 		URL:         fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, objectPath),
 		ContentType: utils.FileHeadertContentType(file),
 	}
