@@ -49,6 +49,7 @@ func (s *LocationsBusiness) Add(request models.LocationRequest) (*models.Locatio
 		Comment:        request.Comment,
 		Latitude:       request.Latitude,
 		Longitude:      request.Longitude,
+		Accuracy:       request.Accuracy,
 		Address:        request.Address,
 		Pictures:       pictures,
 		CreatedOn:      time.Now(),

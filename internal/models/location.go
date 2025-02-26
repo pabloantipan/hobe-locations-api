@@ -19,6 +19,7 @@ type Location struct {
 	Comment        string          `json:"comment" binding:"required" example:"This is a description"`
 	Latitude       float64         `json:"latitude" binding:"required" example:"-34.603722"`
 	Longitude      float64         `json:"longitude" binding:"required" example:"-58.381592"`
+	Accuracy       float64         `json:"accuracy" binding:"required" example:"0.0001"`
 	Pictures       []BucketPicture `json:"pictures" binding:"optional"`
 	Address        string          `json:"address" binding:"required" example:"Av. Corrientes 1234"`
 	CreatedOn      time.Time       `json:"created_on" binding:"required" example:"2021-01-01T00:00:00Z"`
