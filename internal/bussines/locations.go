@@ -10,16 +10,16 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/internal/services"
 )
 
-type LocationBusiness struct {
-	pictureService  services.PictureServiceInterface
-	locationService services.LocationServiceInterface
+type LocationsBusiness struct {
+	pictureService  services.PicturesServiceInterface
+	locationService services.LocationsServiceInterface
 }
 
 func NewLocationBusiness(
-	pictureService services.PictureServiceInterface,
-	locationService services.LocationServiceInterface,
+	pictureService services.PicturesServiceInterface,
+	locationService services.LocationsServiceInterface,
 ) LocationBusinessInterface {
-	return &LocationBusiness{
+	return &LocationsBusiness{
 		pictureService:  pictureService,
 		locationService: locationService,
 	}
@@ -30,11 +30,11 @@ type LocationBusinessInterface interface {
 	GetThemByEmail(email string) (*[]models.Location, error)
 }
 
-func (s *LocationBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
+func (s *LocationsBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
 	return s.locationService.GetThemByEmail(email)
 }
 
-func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location, error) {
+func (s *LocationsBusiness) Add(request models.LocationRequest) (*models.Location, error) {
 	locationID := uuid.New().String()
 
 	pictures, errs := s.uploadPictures(locationID, request.Pictures)
@@ -49,6 +49,7 @@ func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location
 		Comment:        request.Comment,
 		Latitude:       request.Latitude,
 		Longitude:      request.Longitude,
+		Accuracy:       request.Accuracy,
 		Address:        request.Address,
 		Pictures:       pictures,
 		CreatedOn:      time.Now(),
@@ -62,7 +63,7 @@ func (s *LocationBusiness) Add(request models.LocationRequest) (*models.Location
 	return &location, nil
 }
 
-func (s *LocationBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
+func (s *LocationsBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
 	var pictureURLs = make([]models.BucketPicture, 0)
 
 	var errors = make([]error, 0)

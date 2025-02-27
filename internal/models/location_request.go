@@ -18,6 +18,7 @@ type LocationRequest struct {
 	Comment        string                  `form:"comment" binding:"required" example:"This is a description"`
 	Latitude       float64                 `form:"latitude" binding:"required" example:"-34.603722"`
 	Longitude      float64                 `form:"longitude" binding:"required" example:"-58.381592"`
+	Accuracy       float64                 `form:"accuracy" binding:"required" example:"0.0001"`
 	Pictures       []*multipart.FileHeader `form:"pictures" binding:"required"`
 	Address        string                  `form:"address" binding:"required" example:"Av. Corrientes 1234"`
 }
@@ -67,6 +68,12 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 		req.Longitude = utils.ParseEnvFloat64(longitudeSlice[0])
 	} else {
 		errorMessages = append(errorMessages, "longitude is required")
+	}
+
+	if accuracySlice, ok := form.Value["accuracy"]; ok && len(accuracySlice) > 0 {
+		req.Accuracy = utils.ParseEnvFloat64(accuracySlice[0])
+	} else {
+		errorMessages = append(errorMessages, "accuracy is required")
 	}
 
 	if picturesHeaders, ok := form.File["pictures[]"]; ok {

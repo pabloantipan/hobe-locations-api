@@ -11,25 +11,25 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/utils"
 )
 
-type PictureService struct {
+type PicturesService struct {
 	repo storage.PictureRepositoryInterface
 }
 
-func NewPictureService(repo storage.PictureRepositoryInterface) PictureServiceInterface {
-	return &PictureService{repo: repo}
+func NewPictureService(repo storage.PictureRepositoryInterface) PicturesServiceInterface {
+	return &PicturesService{repo: repo}
 }
 
-type PictureServiceInterface interface {
+type PicturesServiceInterface interface {
 	GetURL(locationID, pictureName string) string
 	Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 	validate(file *multipart.FileHeader) (bool, exceptions.PictureException)
 }
 
-func (s *PictureService) GetURL(locationID, pictureName string) string {
+func (s *PicturesService) GetURL(locationID, pictureName string) string {
 	return s.repo.GetURL(locationID, pictureName)
 }
 
-func (s *PictureService) Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
+func (s *PicturesService) Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
 	ctx := context.Background()
 	_, err := s.validate(file)
 	if err.IsPictureError() {
@@ -44,11 +44,11 @@ func (s *PictureService) Upload(file *multipart.FileHeader, subfolder string) (*
 	return result, nil
 }
 
-func (s *PictureService) validate(file *multipart.FileHeader) (bool, exceptions.PictureException) {
+func (s *PicturesService) validate(file *multipart.FileHeader) (bool, exceptions.PictureException) {
 	validator := utils.ImageValidator{
 		MaxFileSize:   2 << 20, // 2MB
 		MaxDimensions: 1024,
-		AllowedTypes:  []string{"image/jpeg", "image/png"},
+		AllowedTypes:  []string{"image/jpeg", "image/png", "image/jpg", "image/gif"},
 	}
 
 	return validator.ValidateBasicProperties(file)

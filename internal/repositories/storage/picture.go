@@ -6,9 +6,11 @@ import (
 	"io"
 	"mime/multipart"
 	"path"
+	"path/filepath"
 	"time"
 
 	"cloud.google.com/go/storage"
+	"github.com/google/uuid"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
 	"github.com/pabloantipan/hobe-locations-api/utils"
 )
@@ -34,14 +36,19 @@ type PictureRepositoryInterface interface {
 	Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 }
 
+func generateFileName(filename string) string {
+	return fmt.Sprintf("%d-%d%s", uuid.New().ID(), time.Now().UnixNano(), filepath.Ext(filename))
+}
+
 func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
+	newFileName := generateFileName(file.Filename)
 	objectPath := file.Filename
 	if subfolder != "" {
-		objectPath = path.Join(subfolder, file.Filename)
+		objectPath = path.Join(subfolder, newFileName)
 	}
 
 	fileInfo := &models.FileInfo{
-		Name:        file.Filename,
+		Name:        newFileName,
 		URL:         fmt.Sprintf("https://storage.googleapis.com/%s/%s", r.bucketName, objectPath),
 		ContentType: utils.FileHeadertContentType(file),
 	}

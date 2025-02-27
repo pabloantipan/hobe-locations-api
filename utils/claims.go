@@ -30,6 +30,8 @@ func ParseClaims(c *gin.Context) (*map[string]interface{}, error) {
 		return nil, fmt.Errorf("claims not found")
 	}
 
+	fmt.Println(claims)
+
 	if len(claims) != 1 {
 		return nil, fmt.Errorf("multiple claims found")
 	}

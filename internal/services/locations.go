@@ -5,15 +5,15 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/internal/repositories/datastore"
 )
 
-type LocationService struct {
+type LocationsService struct {
 	repo datastore.LocationRepository
 }
 
-func NewLocationService(repo datastore.LocationRepository) LocationServiceInterface {
-	return &LocationService{repo: repo}
+func NewLocationService(repo datastore.LocationRepository) LocationsServiceInterface {
+	return &LocationsService{repo: repo}
 }
 
-type LocationServiceInterface interface {
+type LocationsServiceInterface interface {
 	Add(location models.Location) (models.Location, error)
 	GetByID(id string) (models.Location, error)
 	GetAll() ([]models.Location, error)
@@ -22,26 +22,26 @@ type LocationServiceInterface interface {
 	Delete(id string) error
 }
 
-func (s *LocationService) Add(location models.Location) (models.Location, error) {
+func (s *LocationsService) Add(location models.Location) (models.Location, error) {
 	return s.repo.Add(location)
 }
 
-func (s *LocationService) GetByID(id string) (models.Location, error) {
+func (s *LocationsService) GetByID(id string) (models.Location, error) {
 	return s.repo.GetByID(id)
 }
 
-func (s *LocationService) GetThemByEmail(email string) (*[]models.Location, error) {
+func (s *LocationsService) GetThemByEmail(email string) (*[]models.Location, error) {
 	return s.repo.GetThemByEmail(email)
 }
 
-func (s *LocationService) GetAll() ([]models.Location, error) {
+func (s *LocationsService) GetAll() ([]models.Location, error) {
 	return s.repo.GetAll()
 }
 
-func (s *LocationService) Update(location models.Location) (models.Location, error) {
+func (s *LocationsService) Update(location models.Location) (models.Location, error) {
 	return s.repo.Update(location)
 }
 
-func (s *LocationService) Delete(id string) error {
+func (s *LocationsService) Delete(id string) error {
 	return s.repo.Delete(id)
 }
