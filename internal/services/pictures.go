@@ -12,10 +12,10 @@ import (
 )
 
 type picturesService struct {
-	repo storage.PictureRepository
+	repo *storage.PictureRepository
 }
 
-func NewPictureService(repo storage.PictureRepository) PicturesService {
+func NewPictureService(repo *storage.PictureRepository) PicturesService {
 	return &picturesService{repo: repo}
 }
 
@@ -26,7 +26,7 @@ type PicturesService interface {
 }
 
 func (s *picturesService) GetURL(locationID, pictureName string) string {
-	return s.repo.GetURL(locationID, pictureName)
+	return (*s.repo).GetURL(locationID, pictureName)
 }
 
 func (s *picturesService) Upload(file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
@@ -36,7 +36,7 @@ func (s *picturesService) Upload(file *multipart.FileHeader, subfolder string) (
 		return nil, fmt.Errorf("failed to validate file: %v", err)
 	}
 
-	result, error := s.repo.Upload(ctx, file, subfolder)
+	result, error := (*s.repo).Upload(ctx, file, subfolder)
 	if error != nil {
 		return nil, fmt.Errorf("failed to upload file: %v", error)
 	}

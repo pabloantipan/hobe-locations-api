@@ -15,12 +15,17 @@ type LocationRequest struct {
 	UserEmail      string                  `form:"userEmail" binding:"required" example:"john@doe.com"`
 	UserFirebaseID string                  `form:"userFirebaseId" binding:"required" example:"123456"`
 	Name           string                  `form:"name" binding:"required" example:"John Doe"`
+	Address        string                  `form:"address" binding:"required" example:"Av. Corrientes 1234"`
 	Comment        string                  `form:"comment" binding:"required" example:"This is a description"`
 	Latitude       float64                 `form:"latitude" binding:"required" example:"-34.603722"`
 	Longitude      float64                 `form:"longitude" binding:"required" example:"-58.381592"`
 	Accuracy       float64                 `form:"accuracy" binding:"required" example:"0.0001"`
+	PointType      string                  `form:"pointType" binding:"required" example:"ruco"`
+	MenCount       int                     `form:"menCount" binding:"required" example:"2"`
+	WomenCount     int                     `form:"womenCount" binding:"required" example:"2"`
+	HasMigrants    bool                    `form:"hasMigrants" binding:"required" example:"true"`
+	CanSurvey      bool                    `form:"canSurvey" binding:"required" example:"true"`
 	Pictures       []*multipart.FileHeader `form:"pictures" binding:"required"`
-	Address        string                  `form:"address" binding:"required" example:"Av. Corrientes 1234"`
 }
 
 func validateFormData(form *multipart.Form) (*LocationRequest, error) {
@@ -52,6 +57,12 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 		errorMessages = append(errorMessages, "name are required")
 	}
 
+	if addressSlice, ok := form.Value["address"]; ok && len(addressSlice) > 0 {
+		req.Address = addressSlice[0]
+	} else {
+		errorMessages = append(errorMessages, "address is required")
+	}
+
 	if commentSlice, ok := form.Value["comment"]; ok && len(commentSlice) > 0 {
 		req.Comment = commentSlice[0]
 	} else {
@@ -76,16 +87,56 @@ func validateFormData(form *multipart.Form) (*LocationRequest, error) {
 		errorMessages = append(errorMessages, "accuracy is required")
 	}
 
+	if pointTypeSlice, ok := form.Value["pointType"]; ok && len(pointTypeSlice) > 0 {
+		req.PointType = pointTypeSlice[0]
+	} else {
+		errorMessages = append(errorMessages, "pointType is required")
+	}
+
+	if menCountSlice, ok := form.Value["menCount"]; ok && len(menCountSlice) > 0 {
+		menCount, err := utils.ParseStringToInt(menCountSlice[0])
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("menCount: %v", err))
+		}
+		req.MenCount = menCount
+	} else {
+		errorMessages = append(errorMessages, "menCount is required")
+	}
+
+	if womenCountSlice, ok := form.Value["womenCount"]; ok && len(womenCountSlice) > 0 {
+		womenCount, err := utils.ParseStringToInt(womenCountSlice[0])
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("womenCount: %v", err))
+		}
+		req.WomenCount = womenCount
+	} else {
+		errorMessages = append(errorMessages, "womenCount is required")
+	}
+
+	if hasMigrantsSlice, ok := form.Value["hasMigrants"]; ok && len(hasMigrantsSlice) > 0 {
+		hasMigrants, err := utils.ParseStringToBool(hasMigrantsSlice[0])
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("hasMigrants: %v", err))
+		}
+		req.HasMigrants = hasMigrants
+	} else {
+		errorMessages = append(errorMessages, "hasMigrants is required")
+	}
+
+	if canSurveySlice, ok := form.Value["canSurvey"]; ok && len(canSurveySlice) > 0 {
+		canSurvey, err := utils.ParseStringToBool(canSurveySlice[0])
+		if err != nil {
+			errorMessages = append(errorMessages, fmt.Sprintf("canSurvey: %v", err))
+		}
+		req.CanSurvey = canSurvey
+	} else {
+		errorMessages = append(errorMessages, "canSurvey is required")
+	}
+
 	if picturesHeaders, ok := form.File["pictures[]"]; ok {
 		req.Pictures = picturesHeaders
 	} else {
 		req.Pictures = []*multipart.FileHeader{}
-	}
-
-	if addressSlice, ok := form.Value["address"]; ok && len(addressSlice) > 0 {
-		req.Address = addressSlice[0]
-	} else {
-		errorMessages = append(errorMessages, "address is required")
 	}
 
 	if len(errorMessages) > 0 {

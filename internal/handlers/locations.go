@@ -11,10 +11,10 @@ import (
 )
 
 type locationsHandler struct {
-	business bussines.LocationsBusiness
+	business *bussines.LocationsBusiness
 }
 
-func NewLocationsHandler(b bussines.LocationsBusiness) LocationsHandler {
+func NewLocationsHandler(b *bussines.LocationsBusiness) LocationsHandler {
 	return &locationsHandler{business: b}
 }
 
@@ -40,7 +40,7 @@ func (h *locationsHandler) Add(c *gin.Context) {
 		return
 	}
 
-	location, err := h.business.Add(*newLocation)
+	location, err := (*h.business).Add(*newLocation)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -56,7 +56,7 @@ func (h *locationsHandler) GetThemByEmail(c *gin.Context) {
 		return
 	}
 
-	locations, err := h.business.GetThemByEmail(claims.Email)
+	locations, err := (*h.business).GetThemByEmail(claims.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -79,7 +79,7 @@ func (h *locationsHandler) GetThemByMapSquare(c *gin.Context) {
 		return
 	}
 
-	locations, err := h.business.GetThemByMapSquare(claims.Email, request)
+	locations, err := (*h.business).GetThemByMapSquare(claims.Email, &request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
