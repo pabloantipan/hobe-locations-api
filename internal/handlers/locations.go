@@ -11,10 +11,10 @@ import (
 )
 
 type locationsHandler struct {
-	business bussines.LocationsBusiness
+	business *bussines.LocationsBusiness
 }
 
-func NewLocationsHandler(b bussines.LocationsBusiness) LocationsHandler {
+func NewLocationsHandler(b *bussines.LocationsBusiness) LocationsHandler {
 	return &locationsHandler{business: b}
 }
 
@@ -40,7 +40,7 @@ func (h *locationsHandler) Add(c *gin.Context) {
 		return
 	}
 
-	location, err := h.business.Add(*newLocation)
+	location, err := (*h.business).Add(*newLocation)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -50,13 +50,16 @@ func (h *locationsHandler) Add(c *gin.Context) {
 }
 
 func (h *locationsHandler) GetThemByEmail(c *gin.Context) {
+	// this should allowed to get from other email than the user's
+	// Auth policy: Can this user ask for locations from another user?
+	// Admin and super user can, other roles can't
 	claims, err := utils.ParseClaimsAsUserData(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	locations, err := h.business.GetThemByEmail(claims.Email)
+	locations, err := (*h.business).GetThemByEmail(claims.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -79,7 +82,7 @@ func (h *locationsHandler) GetThemByMapSquare(c *gin.Context) {
 		return
 	}
 
-	locations, err := h.business.GetThemByMapSquare(claims.Email, request)
+	locations, err := (*h.business).GetThemByMapSquare(claims.Email, &request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

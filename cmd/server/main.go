@@ -59,10 +59,10 @@ func main() {
 
 	// Initialize repositories
 	pictureRepo := storage.NewPictureRepository(storageClient)
-	locationRepo := datastore.NewDatastoreLocationRepository(ctx, datastoreClient)
+	locationRepo := datastore.NewDatastoreLocationRepository(&ctx, datastoreClient)
 
 	// Initialize services
-	pictureService := services.NewPictureService(pictureRepo)
+	pictureService := services.NewPictureService(&pictureRepo)
 	locationService := services.NewLocationService(locationRepo)
 
 	// Initialize businesses
@@ -73,7 +73,7 @@ func main() {
 	responseLoggerMiddleware := middleware.NewResponseLoggerMiddleware(logger)
 
 	// Initialize handlers
-	locationHandler := handlers.NewLocationsHandler(locationBusiness)
+	locationHandler := handlers.NewLocationsHandler(&locationBusiness)
 
 	// Add(rateLimiter.Handle)
 	healthHandler := handlers.NewHealthHandler(cfg)

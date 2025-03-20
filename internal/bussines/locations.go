@@ -29,7 +29,7 @@ func NewLocationsBusiness(
 type LocationsBusiness interface {
 	Add(locationRequest models.LocationRequest) (*models.Location, error)
 	GetThemByEmail(email string) (*[]models.Location, error)
-	GetThemByMapSquare(authorEmail string, request models.LocationMarkersRequest) (*[]models.Location, error)
+	GetThemByMapSquare(authorEmail string, request *models.LocationMarkersRequest) (*[]models.Location, error)
 }
 
 func (s *locationsBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
@@ -42,17 +42,22 @@ func (s *locationsBusiness) Add(request models.LocationRequest) (*models.Locatio
 	pictures, errs := s.uploadPictures(locationID, request.Pictures)
 	log.Printf("Errors uploading files: %v", errs)
 
-	location := models.Location{
+	location := &models.Location{
 		ID:             locationID,
 		UserID:         request.UserID,
 		UserEmail:      request.UserEmail,
 		UserFirebaseID: request.UserFirebaseID,
 		Name:           request.Name,
+		Address:        request.Address,
 		Comment:        request.Comment,
 		Latitude:       request.Latitude,
 		Longitude:      request.Longitude,
 		Accuracy:       request.Accuracy,
-		Address:        request.Address,
+		PointType:      request.PointType,
+		MenCount:       request.MenCount,
+		WomenCount:     request.WomenCount,
+		HasMigrants:    request.HasMigrants,
+		CanSurvey:      request.CanSurvey,
 		Pictures:       pictures,
 		CreatedOn:      time.Now(),
 	}
@@ -62,7 +67,7 @@ func (s *locationsBusiness) Add(request models.LocationRequest) (*models.Locatio
 		return nil, err
 	}
 
-	return &location, nil
+	return location, nil
 }
 
 func (s *locationsBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
@@ -86,8 +91,8 @@ func (s *locationsBusiness) uploadPictures(locationID string, pictures []*multip
 	return pictureURLs, errors
 }
 
-func (s *locationsBusiness) GetThemByMapSquare(authorEmail string, request models.LocationMarkersRequest) (*[]models.Location, error) {
-	allLocations, err := s.locationService.GetThemByMapSquare(request.Square)
+func (s *locationsBusiness) GetThemByMapSquare(authorEmail string, request *models.LocationMarkersRequest) (*[]models.Location, error) {
+	allLocations, err := s.locationService.GetThemByMapSquare(&request.Square)
 	if err != nil {
 		return nil, err
 	}
