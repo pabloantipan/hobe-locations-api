@@ -50,6 +50,9 @@ func (h *locationsHandler) Add(c *gin.Context) {
 }
 
 func (h *locationsHandler) GetThemByEmail(c *gin.Context) {
+	// this should allowed to get from other email than the user's
+	// Auth policy: Can this user ask for locations from another user?
+	// Admin and super user can, other roles can't
 	claims, err := utils.ParseClaimsAsUserData(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
