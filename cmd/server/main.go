@@ -74,6 +74,7 @@ func main() {
 
 	// Initialize handlers
 	locationHandler := handlers.NewLocationsHandler(&locationBusiness)
+	configsHandler := handlers.NewConfigsHandler()
 
 	// Add(rateLimiter.Handle)
 	healthHandler := handlers.NewHealthHandler(cfg)
@@ -106,6 +107,14 @@ func main() {
 			markers.Use(requestLoggerMiddleware.HandleFunc())
 			markers.Use(responseLoggerMiddleware.HandleFunc())
 			markers.POST("", locationHandler.GetThemByMapSquare)
+		}
+
+		configs := api.Group("configs")
+		{
+			// configs.Use(requestLoggerMiddleware.HandleFunc())
+			// configs.Use(responseLoggerMiddleware.HandleFunc())
+			configs.GET("point-types", configsHandler.GetPointTypes)
+			configs.GET("location-order-options", configsHandler.GetLocationOrderKeys)
 		}
 	}
 
