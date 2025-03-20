@@ -114,7 +114,7 @@ func main() {
 			// configs.Use(requestLoggerMiddleware.HandleFunc())
 			// configs.Use(responseLoggerMiddleware.HandleFunc())
 			configs.GET("point-types", configsHandler.GetPointTypes)
-			configs.GET("location-order-options", configsHandler.GetLocationOrderKeys)
+			configs.GET("order-key-options", configsHandler.GetLocationOrderKeys)
 		}
 	}
 
