@@ -15,23 +15,23 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/utils"
 )
 
-type PictureRepository struct {
+type pictureRepository struct {
 	bucketName string
 	client     *storage.Client
 	bucket     *storage.BucketHandle
 }
 
-func NewPictureRepository(client *storage.Client) PictureRepositoryInterface {
+func NewPictureRepository(client *storage.Client) PictureRepository {
 	bucketName := "hobe-location-picrtures"
 
-	return &PictureRepository{
+	return &pictureRepository{
 		bucketName: bucketName,
 		client:     client,
 		bucket:     client.Bucket(bucketName),
 	}
 }
 
-type PictureRepositoryInterface interface {
+type PictureRepository interface {
 	GetURL(subfolder, pictureName string) string
 	Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error)
 }
@@ -40,7 +40,7 @@ func generateFileName(filename string) string {
 	return fmt.Sprintf("%d-%d%s", uuid.New().ID(), time.Now().UnixNano(), filepath.Ext(filename))
 }
 
-func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
+func (r *pictureRepository) Upload(ctx context.Context, file *multipart.FileHeader, subfolder string) (*models.FileInfo, error) {
 	newFileName := generateFileName(file.Filename)
 	objectPath := file.Filename
 	if subfolder != "" {
@@ -105,7 +105,7 @@ func (r *PictureRepository) Upload(ctx context.Context, file *multipart.FileHead
 	}
 }
 
-func (r *PictureRepository) GetURL(subfolder, filename string) string {
+func (r *pictureRepository) GetURL(subfolder, filename string) string {
 	objectPath := filename
 	if subfolder != "" {
 		objectPath = path.Join(subfolder, filename)

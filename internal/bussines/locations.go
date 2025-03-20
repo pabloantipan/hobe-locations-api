@@ -8,33 +8,35 @@ import (
 	"github.com/google/uuid"
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
 	"github.com/pabloantipan/hobe-locations-api/internal/services"
+	"github.com/pabloantipan/hobe-locations-api/utils"
 )
 
-type LocationsBusiness struct {
-	pictureService  services.PicturesServiceInterface
-	locationService services.LocationsServiceInterface
+type locationsBusiness struct {
+	pictureService  services.PicturesService
+	locationService services.LocationsService
 }
 
-func NewLocationBusiness(
-	pictureService services.PicturesServiceInterface,
-	locationService services.LocationsServiceInterface,
-) LocationBusinessInterface {
-	return &LocationsBusiness{
+func NewLocationsBusiness(
+	pictureService services.PicturesService,
+	locationService services.LocationsService,
+) LocationsBusiness {
+	return &locationsBusiness{
 		pictureService:  pictureService,
 		locationService: locationService,
 	}
 }
 
-type LocationBusinessInterface interface {
+type LocationsBusiness interface {
 	Add(locationRequest models.LocationRequest) (*models.Location, error)
 	GetThemByEmail(email string) (*[]models.Location, error)
+	GetThemByMapSquare(authorEmail string, request models.LocationMarkersRequest) (*[]models.Location, error)
 }
 
-func (s *LocationsBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
+func (s *locationsBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
 	return s.locationService.GetThemByEmail(email)
 }
 
-func (s *LocationsBusiness) Add(request models.LocationRequest) (*models.Location, error) {
+func (s *locationsBusiness) Add(request models.LocationRequest) (*models.Location, error) {
 	locationID := uuid.New().String()
 
 	pictures, errs := s.uploadPictures(locationID, request.Pictures)
@@ -63,7 +65,7 @@ func (s *LocationsBusiness) Add(request models.LocationRequest) (*models.Locatio
 	return &location, nil
 }
 
-func (s *LocationsBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
+func (s *locationsBusiness) uploadPictures(locationID string, pictures []*multipart.FileHeader) ([]models.BucketPicture, []error) {
 	var pictureURLs = make([]models.BucketPicture, 0)
 
 	var errors = make([]error, 0)
@@ -82,4 +84,20 @@ func (s *LocationsBusiness) uploadPictures(locationID string, pictures []*multip
 	}
 
 	return pictureURLs, errors
+}
+
+func (s *locationsBusiness) GetThemByMapSquare(authorEmail string, request models.LocationMarkersRequest) (*[]models.Location, error) {
+	allLocations, err := s.locationService.GetThemByMapSquare(request.Square)
+	if err != nil {
+		return nil, err
+	}
+
+	var locations = make([]models.Location, 0)
+	for _, location := range *allLocations {
+		if !utils.Contains(request.GottenLocationIDs, location.ID) {
+			locations = append(locations, location)
+		}
+	}
+
+	return &locations, nil
 }

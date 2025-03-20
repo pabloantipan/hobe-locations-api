@@ -9,7 +9,7 @@ import (
 	"github.com/pabloantipan/hobe-locations-api/internal/models"
 )
 
-type DatastoreLocationRepo struct {
+type datastoreLocationRepo struct {
 	ctx    context.Context
 	kind   string
 	client *datastore.Client
@@ -17,7 +17,7 @@ type DatastoreLocationRepo struct {
 
 func NewDatastoreLocationRepository(ctx context.Context, client *datastore.Client) LocationRepository {
 	kind := "Location"
-	return &DatastoreLocationRepo{
+	return &datastoreLocationRepo{
 		ctx:    ctx,
 		client: client,
 		kind:   kind,
@@ -29,11 +29,12 @@ type LocationRepository interface {
 	GetByID(id string) (models.Location, error)
 	GetAll() ([]models.Location, error)
 	GetThemByEmail(email string) (*[]models.Location, error)
+	GetThemByMapSquare(square models.MapSquareBounds) (*[]models.Location, error)
 	Update(location models.Location) (models.Location, error)
 	Delete(id string) error
 }
 
-func (r *DatastoreLocationRepo) Add(location models.Location) (models.Location, error) {
+func (r *datastoreLocationRepo) Add(location models.Location) (models.Location, error) {
 
 	if location.ID == "" {
 		location.ID = uuid.New().String()
@@ -49,7 +50,7 @@ func (r *DatastoreLocationRepo) Add(location models.Location) (models.Location, 
 	return location, nil
 }
 
-func (r *DatastoreLocationRepo) GetByID(id string) (models.Location, error) {
+func (r *datastoreLocationRepo) GetByID(id string) (models.Location, error) {
 	key := datastore.NameKey(r.kind, id, nil)
 	location := &models.Location{}
 
@@ -61,7 +62,7 @@ func (r *DatastoreLocationRepo) GetByID(id string) (models.Location, error) {
 	return *location, nil
 }
 
-func (r *DatastoreLocationRepo) GetAll() ([]models.Location, error) {
+func (r *datastoreLocationRepo) GetAll() ([]models.Location, error) {
 
 	var locations []models.Location
 	query := datastore.NewQuery(r.kind)
@@ -78,7 +79,7 @@ func (r *DatastoreLocationRepo) GetAll() ([]models.Location, error) {
 	return locations, nil
 }
 
-func (r *DatastoreLocationRepo) GetThemByEmail(email string) (*[]models.Location, error) {
+func (r *datastoreLocationRepo) GetThemByEmail(email string) (*[]models.Location, error) {
 	query := datastore.NewQuery(r.kind).FilterField("UserEmail", "=", email)
 	var locations []models.Location
 	_, err := r.client.GetAll(r.ctx, query, &locations)
@@ -91,14 +92,33 @@ func (r *DatastoreLocationRepo) GetThemByEmail(email string) (*[]models.Location
 	return &locations, nil
 }
 
-func (r *DatastoreLocationRepo) Update(location models.Location) (models.Location, error) {
+func (r *datastoreLocationRepo) GetThemByMapSquare(square models.MapSquareBounds) (*[]models.Location, error) {
+	fmt.Println(square.NorthLat, square.SouthLat, square.WestLng, square.EastLng)
+	query := datastore.NewQuery(r.kind).
+		FilterField("Latitude", "<=", square.NorthLat).
+		FilterField("Latitude", ">=", square.SouthLat).
+		FilterField("Longitude", "<=", square.EastLng).
+		FilterField("Longitude", ">=", square.WestLng)
+
+	var locations []models.Location
+	_, err := r.client.GetAll(r.ctx, query, &locations)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch locations: %v", err)
+	}
+	if locations == nil {
+		locations = []models.Location{}
+	}
+	return &locations, nil
+}
+
+func (r *datastoreLocationRepo) Update(location models.Location) (models.Location, error) {
 
 	key := datastore.NameKey(r.kind, location.ID, nil)
 	_, err := r.client.Put(r.ctx, key, &location)
 	return location, err
 }
 
-func (r *DatastoreLocationRepo) Delete(id string) error {
+func (r *datastoreLocationRepo) Delete(id string) error {
 	key := datastore.NameKey(r.kind, id, nil)
 	return r.client.Delete(r.ctx, key)
 }
