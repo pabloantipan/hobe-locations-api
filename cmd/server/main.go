@@ -66,7 +66,7 @@ func main() {
 	locationService := services.NewLocationService(locationRepo)
 
 	// Initialize businesses
-	locationBusiness := bussines.NewLocationBusiness(pictureService, locationService)
+	locationBusiness := bussines.NewLocationsBusiness(pictureService, locationService)
 
 	// Initialize middlewares
 	requestLoggerMiddleware := middleware.NewRequestLoggerMiddleware(logger)
@@ -99,6 +99,13 @@ func main() {
 			locations.Use(responseLoggerMiddleware.HandleFunc())
 			locations.POST("", locationHandler.Add)
 			locations.GET("", locationHandler.GetThemByEmail)
+		}
+
+		markers := api.Group("markers")
+		{
+			markers.Use(requestLoggerMiddleware.HandleFunc())
+			markers.Use(responseLoggerMiddleware.HandleFunc())
+			markers.POST("", locationHandler.GetThemByMapSquare)
 		}
 	}
 

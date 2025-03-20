@@ -1,0 +1,5 @@
+indexes:
+- kind: Location
+  properties:
+  - name: Latitude
+  - name: Longitude
