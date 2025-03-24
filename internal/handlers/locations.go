@@ -22,6 +22,7 @@ type LocationsHandler interface {
 	Add(c *gin.Context)
 	GetThemByEmail(c *gin.Context)
 	GetThemByMapSquare(c *gin.Context)
+	GetByID(c *gin.Context)
 }
 
 func (h *locationsHandler) Add(c *gin.Context) {
@@ -89,4 +90,26 @@ func (h *locationsHandler) GetThemByMapSquare(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"locations": locations})
+}
+
+func (h *locationsHandler) GetByID(c *gin.Context) {
+	_, err := utils.ParseClaimsAsUserData(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id, ok := c.Params.Get("id")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id not found"})
+		return
+	}
+
+	location, err := (*h.business).GetByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, location)
 }
