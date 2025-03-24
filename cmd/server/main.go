@@ -100,6 +100,7 @@ func main() {
 			locations.Use(responseLoggerMiddleware.HandleFunc())
 			locations.POST("", locationHandler.Add)
 			locations.GET("", locationHandler.GetThemByEmail)
+			locations.GET("/:id", locationHandler.GetByID)
 		}
 
 		markers := api.Group("markers")

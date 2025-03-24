@@ -30,6 +30,7 @@ type LocationsBusiness interface {
 	Add(locationRequest models.LocationRequest) (*models.Location, error)
 	GetThemByEmail(email string) (*[]models.Location, error)
 	GetThemByMapSquare(authorEmail string, request *models.LocationMarkersRequest) (*[]models.Location, error)
+	GetByID(id string) (*models.Location, error)
 }
 
 func (s *locationsBusiness) GetThemByEmail(email string) (*[]models.Location, error) {
@@ -105,4 +106,8 @@ func (s *locationsBusiness) GetThemByMapSquare(authorEmail string, request *mode
 	}
 
 	return &locations, nil
+}
+
+func (s *locationsBusiness) GetByID(id string) (*models.Location, error) {
+	return s.locationService.GetByID(id)
 }
